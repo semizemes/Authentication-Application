@@ -82,7 +82,7 @@ app.get("/logout", (req, res) => {
  */
 app.get("/secrets", async (req, res) => {
   const userEmail = req.user.email; // Get the authenticated user's email
-  const userSecret = await db.query('select secret from users where email=$1', [userEmail]); // Query the user's secret
+  const userSecret = await db.query('select secret from users where email=$1;', [userEmail]); // Query the user's secret
   let isSecret = userSecret.rows[0].secret; // Extract the secret from the query result
   console.log('The secret comes from SQL:', isSecret);
   if (req.isAuthenticated()) {
@@ -150,7 +150,7 @@ app.post("/register", async (req, res) => {
   const password = req.body.password; // Extract password from the form
 
   try {
-    const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
+    const checkResult = await db.query("SELECT * FROM users WHERE email = $1;", [
       email,
     ]); // Check if the user already exists
 
@@ -162,7 +162,7 @@ app.post("/register", async (req, res) => {
           console.error("Error hashing password:", err);
         } else {
           const result = await db.query(
-              "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
+              "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *;",
               [email, hash]
           ); // Insert the new user into the database
           const user = result.rows[0];
@@ -186,7 +186,7 @@ app.post('/submit', async (req, res) => {
   let userEmail = req.user.email; // Get the authenticated user's email
   let userSecret = req.body.secret; // Get the submitted secret
   try {
-    await db.query('UPDATE users SET secret = $1 WHERE email = $2', [userSecret, userEmail]); // Update the user's secret in the database
+    await db.query('UPDATE users SET secret = $1 WHERE email = $2;', [userSecret, userEmail]); // Update the user's secret in the database
     res.redirect('/secrets'); // Redirect to secrets after updating
   } catch (e) {
     console.log(e);
@@ -201,7 +201,7 @@ passport.use(
     "local",
     new Strategy(async function verify(username, password, cb) {
       try {
-        const result = await db.query("SELECT * FROM users WHERE email = $1 ", [
+        const result = await db.query("SELECT * FROM users WHERE email = $1;", [
           username,
         ]); // Query the user by email
         if (result.rows.length > 0) {
@@ -243,12 +243,12 @@ passport.use(
         },
         async (accessToken, refreshToken, profile, cb) => {
           try {
-            const result = await db.query("SELECT * FROM users WHERE email = $1", [
+            const result = await db.query("SELECT * FROM users WHERE email = $1;", [
               profile.email,
             ]); // Query the user by email
             if (result.rows.length === 0) {
               const newUser = await db.query(
-                  "INSERT INTO users (email, password) VALUES ($1, $2)",
+                  "INSERT INTO users (email, password) VALUES ($1, $2);",
                   [profile.email, "google"]
               ); // Insert a new user if not found
               return cb(null, newUser.rows[0]);
