@@ -238,7 +238,7 @@ passport.use(
         {
           clientID: process.env.GOOGLE_CLIENT_ID, // Google client ID
           clientSecret: process.env.GOOGLE_CLIENT_SECRET, // Google client secret
-          callbackURL: "http://localhost:3000/auth/google/secrets", // Callback URL
+          callbackURL: "https://authentication-application-production.up.railway.app/auth/google/secrets",
           userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo", // User profile URL
         },
         async (accessToken, refreshToken, profile, cb) => {
