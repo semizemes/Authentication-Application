@@ -9,7 +9,7 @@ import session from "express-session";
 import env from "dotenv";
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const saltRounds = 10;
 env.config(); // Load environment variables from a .env file
 
@@ -29,12 +29,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Configure PostgreSQL client
-const db = new pg.Client({
-  user: process.env.PG_USER, // Database username
-  host: process.env.PG_HOST, // Database host
-  database: process.env.PG_DATABASE, // Database name
-  password: process.env.PG_PASSWORD, // Database password
-  port: process.env.PG_PORT, // Database port
+const db = new pg.Pool({
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT || 5432,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 db.connect(); // Connect to the database
 
