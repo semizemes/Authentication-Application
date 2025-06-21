@@ -155,7 +155,7 @@ app.post("/register", async (req, res) => {
     ]); // Check if the user already exists
 
     if (checkResult.rows.length > 0) {
-      req.redirect("/login"); // Redirect to login if user exists
+      res.redirect("/login"); // Redirect to login if user exists
     } else {
       bcrypt.hash(password, saltRounds, async (err, hash) => {
         if (err) {
